@@ -29,6 +29,7 @@ SubsetSum::SubsetSum(const std::string fileLocation, const int numOfTheatres)
     allSurgeries = new Surgery[surgeryArrayCapacity];
     matrix = nullptr;
     read(fileLocation, allSurgeries);
+    matrix = new bool*[numberOfSurgeries];
 }
 
 SubsetSum::~SubsetSum()
@@ -92,7 +93,7 @@ void SubsetSum::printAllSurgeries()
     {
         std::cout << allSurgeries[i];
         if(!allSurgeries[i].isScheduled())
-            std::cout << " Not Schaduled!" << std::endl;
+            std::cout << " Not Scheduled!" << std::endl;
         else
             std::cout << std::endl;
 
@@ -101,10 +102,11 @@ void SubsetSum::printAllSurgeries()
 
 void SubsetSum::viewAllTheatres() const
 {
+    std::cout << std::endl;
     for (int i = 0; i < numberOfTheatres; i++)
     {
         std::cout << "#####################################" << std::endl;
-        std::cout << "Theatre: " << i + 1 << std::endl;
+        std::cout << "Theater: " << i + 1 << std::endl;
         theatres[i].showTheatreSchedule();
         std::cout << "#####################################" << std::endl << std::endl;
     }
@@ -121,14 +123,7 @@ void SubsetSum::initilizeMatrix(int res)
     {
         for (int j = 0; j < res; j++)
         {
-            if(j == 0)
-            {
-                matrix[i][j] = true;
-            }
-            else
-            {
-                matrix[i][j] = false;
-            }
+            matrix[i][j] = j == 0;
         };
     }
 }
@@ -148,15 +143,12 @@ void SubsetSum::constructMatrix()
     }
 
     int res = theatres[biggestTheatre].getTheatreCapacity() + 1;
-    matrix = new bool*[numberOfSurgeries];
+
 
     for (int k = 0; k < numberOfSurgeries; k++)
     {
         matrix[k] = new bool[res];
     }
-
-
-
     initilizeMatrix(res);
 
     for (int i = 0; i < numberOfSurgeries; i++)
@@ -170,8 +162,6 @@ void SubsetSum::constructMatrix()
             }
             else if(i > 0)
             {
-                //std::cout << arrayOne[i] << "Matrix[" << j << "][" << i - 1 << "] || ";
-                //std::cout << "Matrix[" << j - arrayOne[i] << "][" << i - 1 << "]" << std::endl;
                 if(j - allSurgeries[i].getDuration() >= 0)
                     matrix[i][j] = matrix[i - 1][j] || matrix[i - 1][j - allSurgeries[i].getDuration()];
                 else
@@ -179,21 +169,21 @@ void SubsetSum::constructMatrix()
             }
         }
     }
-
-    printMatrix(res);
 }
 
 void SubsetSum::printMatrix(int x)
 {
+    x += 1;
     std::cout << std::endl;
     std::cout << std::endl;
 
-    auto separator  = static_cast<char>('  ');
-    const int numberWidth = 4;
-    std::cout << std::left << std::setw(numberWidth) << std::setfill(separator) << "";
+    std::cout << "     " << std::left << std::setw(6) << std::setfill(' ');
     for (int j = 0; j < x; j++)
     {
-        std::cout << std::left << std::setw(numberWidth) << std::setfill(separator) << j;
+        std::string temp = "[";
+        temp += std::to_string(j);
+        temp += "]";
+        std::cout << std::left << std::setw(6) << std::setfill(' ') << temp;
     };
     std::cout << std::endl;
     for (int i = 0; i < numberOfSurgeries; i++)
@@ -202,28 +192,38 @@ void SubsetSum::printMatrix(int x)
         {
             if(j == 0)
             {
-                std::cout << std::left << std::setw(numberWidth) << std::setfill(separator) << allSurgeries[i].getDuration();
+                std::string temp = "[";
+                temp += std::to_string(allSurgeries[i].getDuration());
+                temp += "]";
+                std::cout << std::left << std::setw(6) << std::setfill(' ') << temp;
             }
-            std::cout << std::left << std::setw(numberWidth) << std::setfill(separator) << matrix[i][j];
+            std::cout << std::left << std::setw(6) << std::setfill(' ') << matrix[i][j];
         };
         std::cout << std::endl;
     }
 }
 
-void SubsetSum::planSurgeries(int theatre, int y, int x)
+void SubsetSum::planSurgeries(int theatre, int y, int x, int timeToSave)
 {
-    std::cout << "-------------Y: " << y - 1 << " x: " << x << std::endl;
-    if (x == 0)
+    if (x <= timeToSave)
         return;
-    if (matrix[y][x - allSurgeries[y].getDuration()] && !allSurgeries[y].isScheduled())
+    if (matrix[y][x - allSurgeries[y].getDuration()] && !allSurgeries[y].isScheduled() && theatres[theatre].timeLeft(allSurgeries[y]))
     {
         theatres[theatre].planSurgery(allSurgeries[y]);
         allSurgeries[y].schedule();
-        return planSurgeries(theatre, y - 1, x - allSurgeries[y].getDuration());
+        return planSurgeries(theatre, y - 1, x - allSurgeries[y].getDuration(), timeToSave);
     }
     else if(matrix[y - 1][x])
     {
-        return planSurgeries(theatre, y - 1, x);
-
+        return planSurgeries(theatre, y - 1, x, timeToSave);
     }
+    else if(!matrix[y - 1][x])
+    {
+        return planSurgeries(theatre, y, x - 1, timeToSave);
+    }
+}
+
+int SubsetSum::getNrOfSurgeries() const
+{
+    return numberOfSurgeries;
 }

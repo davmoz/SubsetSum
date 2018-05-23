@@ -2,84 +2,107 @@
 # include <ctime>
 #include "SubsetSum.h"
 
+void solutionOne(std::string fileName, int minToSpare);
+void solutionTwo(std::string fileName, int minToSpare);
+
 
 
 int main()
+{
+
+    std::cout << std::endl;
+    std::cout << "###################" << std::endl;
+    std::cout << "#####Solution1#####" << std::endl;
+    std::cout << "###################" << std::endl;
+    int minToSpare = 100;
+    std::cout << "Reserved amount of minutes: " << minToSpare << std::endl;
+    solutionOne("Operationer_1b.txt", minToSpare);
+    minToSpare = 50;
+    std::cout << "Reserved amount of minutes: " << minToSpare << std::endl;
+    solutionOne("Operationer_1b.txt", minToSpare);
+    minToSpare = 0;
+    std::cout << "Reserved amount of minutes: " << minToSpare << std::endl;
+    solutionOne("Operationer_1b.txt", minToSpare);
+
+    std::cout << std::endl;
+    std::cout << "###################" << std::endl;
+    std::cout << "#####Solution2#####" << std::endl;
+    std::cout << "###################" << std::endl;
+    minToSpare = 100;
+    std::cout << "Reserved amount of minutes: " << minToSpare << std::endl;
+    solutionTwo("Operationer_2.txt", minToSpare);
+    minToSpare = 50;
+    std::cout << "Reserved amount of minutes: " << minToSpare << std::endl;
+    solutionTwo("Operationer_2.txt", minToSpare);
+    minToSpare = 0;
+    std::cout << "Reserved amount of minutes: " << minToSpare << std::endl;
+    solutionTwo("Operationer_2.txt", minToSpare);
+
+    return 0;
+}
+
+
+void solutionOne(const std::string fileName, int minToSpare)
+{
+
+    clock_t start;
+    clock_t end;
+
+    SubsetSum binPacking(fileName, 3);
+
+    int timeCapacity = 660;
+    binPacking.setHours(0, 0, timeCapacity);
+    binPacking.setHours(1, 0, timeCapacity);
+    binPacking.setHours(2, 0, timeCapacity);
+
+    binPacking.sortSurgeriesAsc();
+    binPacking.constructMatrix();
+    //binPacking.printMatrix(timeCapacity);
+
+    start = clock();
+    int nrOfSurgeries = binPacking.getNrOfSurgeries() - 1;
+    binPacking.planSurgeries(0, nrOfSurgeries, timeCapacity, minToSpare);
+    binPacking.planSurgeries(1, nrOfSurgeries, timeCapacity, minToSpare);
+    binPacking.planSurgeries(2, nrOfSurgeries, timeCapacity, minToSpare);
+    end = clock();
+
+    binPacking.viewAllTheatres();
+    binPacking.printAllSurgeries();
+    std::cout << std::endl << "#########################" << std::endl;
+    std::cout << "TIME: " << std::setprecision (10) << std::fixed << (end - start) / (double) CLOCKS_PER_SEC << "s" << std::endl;
+    std::cout << "#########################" << std::endl;
+}
+
+void solutionTwo(std::string fileName, int minToSpare)
 {
     clock_t start;
     clock_t end;
 
 
-    SubsetSum binPacking("Operationer_1a.txt", 3);
+    SubsetSum binPacking(fileName, 6);
     binPacking.setHours(0, 0, 660);
     binPacking.setHours(1, 0, 660);
-    binPacking.setHours(2, 0, 660);
+    binPacking.setHours(2, 0, 840);
+    binPacking.setHours(3, 0, 840);
+    binPacking.setHours(4, 0, 540);
+    binPacking.setHours(5, 0, 540);
 
     binPacking.sortSurgeriesAsc();
-
-
-
     binPacking.constructMatrix();
+    //binPacking.printMatrix(timeCapacity);
+
     start = clock();
-    binPacking.planSurgeries(0, 18, 660);
-    binPacking.planSurgeries(1, 18, 660);
-    binPacking.planSurgeries(2, 18, 660);
+    binPacking.planSurgeries(2, 38, 840, minToSpare);
+    binPacking.planSurgeries(3, 38, 840, minToSpare);
+    binPacking.planSurgeries(4, 38, 540, minToSpare);
+    binPacking.planSurgeries(5, 38, 540, minToSpare);
+    binPacking.planSurgeries(0, 38, 660, minToSpare);
+    binPacking.planSurgeries(1, 38, 660, minToSpare);
     end = clock();
-    std::cout << "TIME: " << end - start << std::endl;
+
     binPacking.viewAllTheatres();
     binPacking.printAllSurgeries();
-
-
-    /*SubsetSum binPacking2("Operationer_1b.txt", 3);
-    binPacking2.setHours(0, 0, 660);
-    binPacking2.setHours(1, 0, 660);
-    binPacking2.setHours(2, 0, 660);
-
-    binPacking2.sortSurgeriesAsc();
-
-    binPacking2.constructMatrix();
-    start = clock();
-    binPacking2.planSurgeries(0, 16, 660);
-    binPacking2.planSurgeries(1, 16, 660);
-    binPacking2.planSurgeries(2, 16, 660);
-    end = clock();
-    std::cout << "TIME: " << end - start << std::endl;
-    binPacking2.viewAllTheatres();
-
-    binPacking2.printAllSurgeries();*/
-
-
-
-    /*SubsetSum binPacking3("Operationer_2.txt", 6);
-    binPacking3.setHours(0, 0, 660);
-    binPacking3.setHours(1, 0, 660);
-    binPacking3.setHours(2, 0, 840);
-    binPacking3.setHours(3, 0, 840);
-    binPacking3.setHours(4, 0, 540);
-    binPacking3.setHours(5, 0, 540);
-
-    binPacking3.sortSurgeriesAsc();
-    binPacking3.constructMatrix();
-
-    start = clock();
-    std::cout << std::endl << std::endl << "Sal 1: " << std::endl;
-    binPacking3.planSurgeries(4, 38, 540);
-    std::cout << "Sal 2: " << std::endl;
-    binPacking3.planSurgeries(5, 38, 540);
-    std::cout << "Sal 3: " << std::endl;
-    binPacking3.planSurgeries(0, 38, 660);
-    std::cout << "Sal 4: " << std::endl;
-    binPacking3.planSurgeries(1, 38, 660);
-    std::cout << "Sal 5: " << std::endl;
-    binPacking3.planSurgeries(2, 38, 840);
-    std::cout << "Sal 6: " << std::endl;
-    binPacking3.planSurgeries(3, 38, 840);
-
-
-    end = clock();
-    binPacking3.viewAllTheatres();
-    binPacking3.printAllSurgeries();
-    std::cout << "TIME: " << end - start << std::endl;*/
-
-    return 0;
+    std::cout << std::endl << "#########################" << std::endl;
+    std::cout << "TIME: " << std::setprecision (10) << std::fixed << (end - start) / (double) CLOCKS_PER_SEC << "s" << std::endl;
+    std::cout << "#########################" << std::endl;
 }

@@ -23,8 +23,6 @@ public:
     SubsetSum(std::string fileLocation, int numOfTheatres);
     ~SubsetSum();
 
-    // Instead of calling this function in this class's constructor,
-    // Do something else????????
     void read(std::string fileLocation, Surgery surgeries[]);
     void printAllSurgeries();
     void viewAllTheatres() const;
@@ -33,6 +31,6 @@ public:
     void constructMatrix();
     void printMatrix(int x);
     void sortSurgeriesAsc();
-    void planSurgeries(int theatre, int x, int y);
-    //void planSurgeries();
+    void planSurgeries(int theatre, int x, int y, int timeToSave);
+    int getNrOfSurgeries() const;
 };
